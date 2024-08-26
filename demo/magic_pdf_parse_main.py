@@ -1,8 +1,14 @@
-import os
+import os, sys
 import json
 import copy
 
 from loguru import logger
+
+# 单独debug时启用
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 
 from magic_pdf.pipe.UNIPipe import UNIPipe
 from magic_pdf.pipe.OCRPipe import OCRPipe
@@ -132,5 +138,5 @@ def pdf_parse_main(
 
 # 测试
 if __name__ == '__main__':
-    pdf_path = r"C:\Users\XYTK2\Desktop\2024-2016-gb-cd-300.pdf"
+    pdf_path = r"/opt/models/001.pdf"
     pdf_parse_main(pdf_path)

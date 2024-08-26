@@ -1,7 +1,12 @@
-import os
+import os, sys
 import json
 
 from loguru import logger
+
+# 单独debug时启用
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 from magic_pdf.pipe.UNIPipe import UNIPipe
 from magic_pdf.rw.DiskReaderWriter import DiskReaderWriter

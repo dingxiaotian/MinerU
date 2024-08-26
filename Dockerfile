@@ -27,10 +27,15 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 # Create a virtual environment for MinerU
 RUN python3 -m venv /opt/mineru_venv
 
-# Activate the virtual environment and install necessary Python packages
-RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install magic-pdf[full-cpu] detectron2 --extra-index-url https://myhloli.github.io/wheels/"
+RUN /bin/bash -c "source /opt/mineru_venv/bin/activate"
+
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip config set install.trusted-host pypi.tuna.tsinghua.edu.cn
+
+RUN pip install --upgrade pip
+RUN pip install magic-pdf[full-cpu] detectron2 --extra-index-url https://myhloli.github.io/wheels/
+RUN pip install struct-eqtable
+RUN pip install pypandoc
 
 # Copy the configuration file template and set up the model directory
 COPY magic-pdf.template.json /root/magic-pdf.json
