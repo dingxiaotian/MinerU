@@ -11,10 +11,12 @@ if deploy_target == 'test':
     service_port = 9010   # 服务端口
     AUTH_ENABLED = False
     SECRET_KEY = "c2VjcmV0OmtleQ=="
+    ENABLE_CORS = True    # 是否允许跨域
 
 # 生产环境
 else:
     service_port = 9010   # 服务端口
     AUTH_ENABLED = False
     SECRET_KEY = "c2VjcmV0OmtleQ=="
+    ENABLE_CORS = True
     
