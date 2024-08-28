@@ -1,9 +1,16 @@
-from magic_pdf.rw.AbsReaderWriter import AbsReaderWriter
-from magic_pdf.libs.commons import parse_aws_param, parse_bucket_key, join_path
 import boto3
 from loguru import logger
 from botocore.config import Config
+import os, sys
 
+# 单独debug时启用
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(parent_dir)
+sys.path.append(parent_dir)
+
+from magic_pdf.rw.AbsReaderWriter import AbsReaderWriter
+from magic_pdf.libs.commons import parse_aws_param, parse_bucket_key, join_path
 
 class S3ReaderWriter(AbsReaderWriter):
     def __init__(
@@ -75,6 +82,25 @@ class S3ReaderWriter(AbsReaderWriter):
         return res["Body"].read()
 
 
+    # 生成预签名 URL
+    def generate_presigned_url(self, s3_relative_path, expiration=3600):
+        if s3_relative_path.startswith("s3://"):
+            s3_path = s3_relative_path
+        else:
+            s3_path = join_path(self.path, s3_relative_path)
+
+        bucket_name, key = parse_bucket_key(s3_path)
+        try:
+            response = self.client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name, 'Key': key},
+                ExpiresIn=expiration
+            )
+        except Exception as e:
+            print(f"Credentials not available: {str(e)}")
+            return None
+        return response
+
 if __name__ == "__main__":
     if 0:
         # Config the connection info
@@ -127,16 +153,44 @@ if __name__ == "__main__":
         ak = os.getenv("AK", "")
         sk = os.getenv("SK", "")
         endpoint_url = os.getenv("ENDPOINT", "")
-        bucket = os.getenv("S3_BUCKET", "")
-        prefix = os.getenv("S3_PREFIX", "")
-        key_basename = os.getenv("S3_KEY_BASENAME", "")
-        s3_reader_writer = S3ReaderWriter(
-            ak, sk, endpoint_url, "auto", f"s3://{bucket}/{prefix}"
-        )
-        content_bin = s3_reader_writer.read_offset(key_basename)
-        assert content_bin[:10] == b'{"track_id'
-        assert content_bin[-10:] == b'r":null}}\n'
+        bucket_name = os.getenv("S3_BUCKET", "")
 
-        content_bin = s3_reader_writer.read_offset(key_basename, offset=424, limit=426)
-        jso = json.dumps(content_bin.decode("utf-8"))
-        print(jso)
+        s3_reader_writer = S3ReaderWriter(
+            ak, sk, endpoint_url, "auto", f"s3://{bucket_name}"
+        )
+
+        # Write text data to S3
+        text_data = "This is some text data"
+        s3_reader_writer.write(
+            text_data,
+            s3_relative_path=f"s3://{bucket_name}/test.json",
+            mode=AbsReaderWriter.MODE_TXT,
+        )
+
+        # Read text data from S3
+        text_data_read = s3_reader_writer.read(
+            s3_relative_path=f"s3://{bucket_name}/test.json", mode=AbsReaderWriter.MODE_TXT
+        )
+        logger.info(f"Read text data from S3: {text_data_read}")
+        # Write binary data to S3
+        binary_data = b"This is some binary data"
+        s3_reader_writer.write(
+            text_data,
+            s3_relative_path=f"s3://{bucket_name}/test.json",
+            mode=AbsReaderWriter.MODE_BIN,
+        )
+
+        url = s3_reader_writer.generate_presigned_url(s3_relative_path=f"s3://{bucket_name}/test.json")
+        print(url)
+
+        # Read binary data from S3
+        binary_data_read = s3_reader_writer.read(
+            s3_relative_path=f"s3://{bucket_name}/test.json", mode=AbsReaderWriter.MODE_BIN
+        )
+        logger.info(f"Read binary data from S3: {binary_data_read}")
+
+        # Range Read text data from S3
+        binary_data_read = s3_reader_writer.read_offset(
+            path=f"s3://{bucket_name}/test.json", offset=0, limit=10
+        )
+        logger.info(f"Read binary data from S3: {binary_data_read}")
