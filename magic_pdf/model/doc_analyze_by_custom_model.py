@@ -80,17 +80,19 @@ def custom_model_init(ocr: bool = False, show_log: bool = False):
             from magic_pdf.model.pp_structure_v2 import CustomPaddleModel
             custom_model = CustomPaddleModel(ocr=ocr, show_log=show_log)
         elif model == MODEL.PEK:
-            from magic_pdf.model.pdf_extract_kit import CustomPEKModel
-            # 从配置文件读取model-dir和device
-            local_models_dir = get_local_models_dir()
-            device = get_device()
-            table_config = get_table_recog_config()
-            model_input = {"ocr": ocr,
-                           "show_log": show_log,
-                           "models_dir": local_models_dir,
-                           "device": device,
-                           "table_config": table_config}
-            custom_model = CustomPEKModel(**model_input)
+            # from magic_pdf.model.pdf_extract_kit import CustomPEKModel
+            # # 从配置文件读取model-dir和device
+            # local_models_dir = get_local_models_dir()
+            # device = get_device()
+            # table_config = get_table_recog_config()
+            # model_input = {"ocr": ocr,
+            #                "show_log": show_log,
+            #                "models_dir": local_models_dir,
+            #                "device": device,
+            #                "table_config": table_config}
+            # custom_model = CustomPEKModel(**model_input)
+            from magic_pdf.model.pdf_extract_kit_preload import PreloadedPEKModel
+            custom_model = PreloadedPEKModel(ocr=ocr, show_log=show_log)
         else:
             logger.error("Not allow model_name!")
             exit(1)

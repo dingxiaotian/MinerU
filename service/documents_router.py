@@ -1,18 +1,50 @@
-import os
-import tempfile
-import subprocess
-
-# from omniparse.documents.parse import parse_single_pdf
-from fastapi import APIRouter, File, UploadFile, HTTPException
+import os, sys
+from fastapi import APIRouter, File, UploadFile, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+# 单独debug时启用
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+from service.utils import b64_decode, download_document
+
+# Document parsing router.
 document_router = APIRouter()
 
 # Document parsing endpoints
 @document_router.post("/pdf")
-async def parse_pdf_endpoint(file: UploadFile = File(...)):
+async def parse_pdf_endpoint(info: Request):
+    req_info = await info.json()
+
+    # Init responds dict.
+    res_dict = {}
+    res_dict['success'] = False
+    res_dict['message'] = ''
+    res_dict['data'] = {}
+
+    url = req_info.get('url', '')
+    doc_b64 = req_info.get('base64', '')
+
+    if not len(url) and not len(doc_b64):
+        res_dict['message'] = 'Both pdf url and document base64 data are empty.'
+        return JSONResponse(content=res_dict, media_type='application/json')
+
+    # if has document b64:
+    file_bytes = b''
+    if len(doc_b64):
+        file_bytes = b64_decode(doc_b64)
+
+    if not len(file_bytes) and len(url):
+        file_bytes = download_document(url)
+
+    # 如果最终没有filebytes
+    if not(file_bytes):
+        res_dict['message'] = 'Cannot get file data.'
+        return JSONResponse(content=res_dict, media_type='application/json')
+    
+    # Start processing.
     try:
-        file_bytes = await file.read()
         full_text, images, out_meta = convert_single_pdf(
             file_bytes, model_state.model_list
         )

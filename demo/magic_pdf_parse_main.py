@@ -138,5 +138,5 @@ def pdf_parse_main(
 
 # 测试
 if __name__ == '__main__':
-    pdf_path = r"/opt/models/001.pdf"
+    pdf_path = r"/opt/models/RNNT.pdf"
     pdf_parse_main(pdf_path)
