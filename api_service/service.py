@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import os, sys
-import argparse
-
 import logging
-
-from typing import Optional
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import json
 
-from fastapi.responses import JSONResponse
+# 单独debug时启用
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-from documents_router import document_router
-from image_router import image_router
-from web_router import website_router
+from api_service.documents_router import document_router
+from api_service.image_router import image_router
+from api_service.web_router import website_router
 
 import config as cfg
 

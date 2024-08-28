@@ -11,7 +11,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from service.utils import b64_decode, download_document, pdf_parse_main
+from api_service.utils import b64_decode, download_document, pdf_parse_main
 
 # Document parsing router.
 document_router = APIRouter()
