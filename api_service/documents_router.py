@@ -52,19 +52,18 @@ async def parse_pdf_endpoint(info: Request):
     # Create a temp dir.
     temp_dir = tempfile.mkdtemp()
     try:
-        success, msg, res_dict = pdf_parse_main(file_bytes=file_bytes,
+        success, msg, res = pdf_parse_main(pdf_bytes=file_bytes,
                                                 parse_method=parse_method,
                                                 out_img_path=temp_dir
                                                 )
         res_dict['success'] = success
         res_dict['message'] = msg
-        res_dict['data'] = res_dict
+        res_dict['data'] = res
     
     except Exception as e:
         print(e)
         res_dict['success'] = False
         res_dict['message'] = str(e)
-        res_dict['data'] = res_dict
 
     finally:
         # 清除临时文件夹及其内容
@@ -109,10 +108,10 @@ async def parse_any_endpoint(info: Request):
         file_bytes = download_document(url)
 
     # 创建临时ppt文件
-    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext, mode='wb') as tmp_ppt:
-        tmp_ppt.write(file_bytes)
-        tmp_ppt.flush()
-        input_path = tmp_ppt.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext, mode='wb') as tmp_file:
+        tmp_file.write(file_bytes)
+        tmp_file.flush()
+        input_path = tmp_file.name
 
     output_dir = tempfile.mkdtemp()
     command = [
@@ -139,19 +138,18 @@ async def parse_any_endpoint(info: Request):
         pdf_bytes = pdf_file.read()
 
     try:
-        success, msg, res_dict = pdf_parse_main(file_bytes=pdf_bytes,
+        success, msg, res = pdf_parse_main(pdf_bytes=pdf_bytes,
                                                 parse_method=parse_method,
                                                 out_img_path=output_dir
                                                 )
         res_dict['success'] = success
         res_dict['message'] = msg
-        res_dict['data'] = res_dict
+        res_dict['data'] = res
     
     except Exception as e:
         print(e)
         res_dict['success'] = False
         res_dict['message'] = str(e)
-        res_dict['data'] = res_dict
 
     finally:
         # 清除临时文件夹及其内容
