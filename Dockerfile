@@ -33,8 +33,10 @@ RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip config set install.trusted-host pypi.tuna.tsinghua.edu.cn
 
 RUN pip install --upgrade pip
-RUN pip install magic-pdf[full-cpu] detectron2 --extra-index-url https://myhloli.github.io/wheels/
+RUN pip install detectron2 --extra-index-url https://myhloli.github.io/wheels/
 RUN pip install struct-eqtable pypandoc fastapi uvicorn requests python-multipart
+# Install depends for magic-doc
+RUN pip install func-timeout smart-open python-pptx python-docx
 
 # Copy the configuration file template and set up the model directory
 COPY magic-pdf.template.json /root/magic-pdf.json
