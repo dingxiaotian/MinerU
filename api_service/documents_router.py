@@ -53,18 +53,30 @@ async def parse_pdf_endpoint(info: Request):
     # Create a temp dir.
     temp_dir = tempfile.mkdtemp()
     try:
+<<<<<<< HEAD
         success, msg, res = pdf_parse_main(pdf_bytes=file_bytes,
+=======
+        success, msg, result = pdf_parse_main(pdf_bytes=file_bytes,
+>>>>>>> e2b3571 (bugfix)
                                                 parse_method=parse_method,
                                                 out_img_path=temp_dir
                                                 )
         res_dict['success'] = success
         res_dict['message'] = msg
+<<<<<<< HEAD
         res_dict['data'] = res
+=======
+        res_dict['data'] = result
+>>>>>>> e2b3571 (bugfix)
     
     except Exception as e:
         print(e)
         res_dict['success'] = False
         res_dict['message'] = str(e)
+<<<<<<< HEAD
+=======
+        res_dict['data'] = result
+>>>>>>> e2b3571 (bugfix)
 
     finally:
         # 清除临时文件夹及其内容
@@ -141,18 +153,30 @@ async def parse_any_endpoint(info: Request):
         pdf_bytes = pdf_file.read()
 
     try:
+<<<<<<< HEAD
         success, msg, res = pdf_parse_main(pdf_bytes=pdf_bytes,
+=======
+        success, msg, result = pdf_parse_main(pdf_bytes=pdf_bytes,
+>>>>>>> e2b3571 (bugfix)
                                                 parse_method=parse_method,
                                                 out_img_path=output_dir
                                                 )
         res_dict['success'] = success
         res_dict['message'] = msg
+<<<<<<< HEAD
         res_dict['data'] = res
+=======
+        res_dict['data'] = result
+>>>>>>> e2b3571 (bugfix)
     
     except Exception as e:
         print(e)
         res_dict['success'] = False
         res_dict['message'] = str(e)
+<<<<<<< HEAD
+=======
+        res_dict['data'] = result
+>>>>>>> e2b3571 (bugfix)
 
     finally:
         # 清除临时文件夹及其内容
